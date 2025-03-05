@@ -7,17 +7,21 @@ export class HomeScene extends BaseScene {
   private tunnelMaterial: ShaderMaterial;
   private config: SceneConfig;
 
-  constructor(el: HTMLElement) {
-    const config: SceneConfig = {
-      background: 0x000000, // Nero digitale
+  constructor(domEl: HTMLElement) {
+    super();
+
+
+    this.config = {
+      background: 0xffffff,
     };
 
-    super({
-      domEl: el,
-      isMobile: false,
-      config
-    });
-    this.config = config;
+
+    this.initializeScene({
+      domEl,
+      config: this.config
+    })
+
+
     this.objsPaths = this.get3dPaths();
     this.setupScene();
   }
@@ -73,14 +77,14 @@ export class HomeScene extends BaseScene {
   }
 
   animate() {
-    this.animationFrameId = requestAnimationFrame(this.animate);
+    this.animationFrameId = requestAnimationFrame(() => this.animate());
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
 
     if (this.tunnelMaterial) {
-      this.tunnelMaterial.uniforms['time'].value += 0.02;
+      // this.tunnelMaterial.uniforms['time'].value += 0.02;
     }
 
-    this.camera.position.z -= 0.1;
+    // this.camera.position.z -= 0.1;
   }
 }

@@ -15,6 +15,6 @@ export interface SceneConfig {
 
 export interface SceneData {
   domEl: HTMLElement,
-  isMobile: boolean,
+  isMobile?: boolean,
   config: SceneConfig
 }

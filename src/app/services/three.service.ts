@@ -3,7 +3,7 @@ import { LoadingManager } from 'three/src/Three.Core.js';
 import { GLTFLoader } from 'three/examples/jsm/Addons.js';
 import { HomeScene } from '@configs/home-scene.config';
 import { BaseScene } from '@configs/base-scene.config';
-import { Scenes } from '@enums/scenes';
+import { SceneIds, Scenes } from '@configs/scene-factory';
 
 @Injectable({
   providedIn: 'root'
@@ -11,33 +11,24 @@ import { Scenes } from '@enums/scenes';
 export class ThreeService {
   private loadManager = new LoadingManager();
   private gltfLoader = new GLTFLoader(this.loadManager);
-  private scenes = new Map<Scenes, BaseScene>();
+  private scenes = new Map<SceneIds, BaseScene>();
 
   public ready = signal<boolean>(false);
 
-  public animate = (sceneId: Scenes): void => {
-    const instance = this.scenes.get(sceneId);
-    if(instance) {
-      instance.animationFrameId = requestAnimationFrame(() => this.animate(sceneId));
-      // dev mode
-      instance.controls.update();
-      // dev mode 
-      instance.renderer.render(instance.scene, instance.camera);
-    }
+  private loading() {
+    this.loadManager.onProgress = (itemJustLoadPath: string, loaded: number, total: number) => {
+      console.log(itemJustLoadPath);
+      
+    };
   }
 
-  public async initSceneById(element: HTMLElement, sceneId: Scenes): Promise<void> {
+  public async initSceneById(element: HTMLElement, sceneId: SceneIds): Promise<void> {
     if(this.scenes.has(sceneId)) return Promise.reject(`Scene ${sceneId} already instantiated!`);
 
-    let sceneData: BaseScene;
+    const SceneClass = Scenes[sceneId];
+    if(!SceneClass) return Promise.reject(`Scene ${sceneId} not found!`);
 
-    switch(sceneId) {
-      case Scenes.Home:
-        sceneData = new HomeScene(element);
-      break;
-      default:
-      return Promise.reject(`Scene ${sceneId} not found!`);
-    }
+    const sceneData = new SceneClass(element);
     this.scenes.set(sceneId, sceneData);
   }
 
@@ -53,7 +44,7 @@ export class ThreeService {
   //   }
   // }
 
-  public uploadModels(sceneId: Scenes) {
+  public uploadModels(sceneId: SceneIds) {
     const instance = this.scenes.get(sceneId);
     if(instance) {
       instance.objsPaths.forEach(obj => this.gltfLoader.load(
@@ -61,8 +52,13 @@ export class ThreeService {
       ));
     }
   }
+  
+  public animate = (sceneId: SceneIds): void => {
+    const instance = this.scenes.get(sceneId);
+    if(instance) { instance.animate() }
+  }
 
-  public destroyScene(sceneId: Scenes) {
+  public destroyScene(sceneId: SceneIds) {
     const instance = this.scenes.get(sceneId);
     if(instance) {
       cancelAnimationFrame(instance.animationFrameId);

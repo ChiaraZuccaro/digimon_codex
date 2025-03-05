@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnDestroy } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
-import { Scenes } from '@enums/scenes';
+import { SceneIds } from '@configs/scene-factory';
 import { descrHome, keywordsHome } from '@meta/meta-home';
 import { ThreeService } from '@services/three.service';
 
@@ -11,7 +11,7 @@ import { ThreeService } from '@services/three.service';
   styleUrl: './home.component.scss'
 })
 export class HomeComponent implements AfterViewInit, OnDestroy {
-  private id = Scenes.Home;
+  private id: SceneIds = 'home';
   
   constructor(
     private _threeService: ThreeService,

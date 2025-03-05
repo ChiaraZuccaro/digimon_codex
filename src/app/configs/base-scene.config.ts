@@ -13,13 +13,6 @@ export abstract class BaseScene {
   public animationFrameId: number;
   public objsPaths: string[];
 
-  constructor(data: SceneData) {
-    this.element = data.domEl;
-    this.sizes = this.setSizeFromEl();
-
-    this.init(data.config);
-  }
-
   private setSizeFromEl() {
     const { offsetWidth: width, offsetHeight: height } = this.element;
     return { width, height };
@@ -66,6 +59,13 @@ export abstract class BaseScene {
     this.element.appendChild(this.renderer.domElement);
 
     this.renderer.render(this.scene, this.camera);
+  }
+
+  public initializeScene(data: SceneData) {
+    this.element = data.domEl;
+    this.sizes = this.setSizeFromEl();
+
+    this.init(data.config);
   }
 
   public destroy() {
